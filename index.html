@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LED Simulator</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="stage-wrapper">
+      <p class="id-label" id="idLabel">ID : 1</p>
+
+      <div class="stage">
+        <div class="part">
+          <p class="label">LED</p>
+          <div class="led"></div>
+        </div>
+
+        <div class="part">
+          <p class="label">Button</p>
+          <div class="button" id="idButton"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings">
+      <h2 class="settings__title">Timing Settings</h2>
+
+      <label class="settings__row">
+        <span>LED ON TIME (ms)</span>
+        <input type="text" id="onTimeInput" inputmode="numeric" value="400" />
+      </label>
+
+      <label class="settings__row">
+        <span>LED OFF TIME (ms)</span>
+        <input type="text" id="offTimeInput" inputmode="numeric" value="400" />
+      </label>
+
+      <label class="settings__row">
+        <span>INTERVAL (ms)</span>
+        <input type="text" id="intervalInput" inputmode="numeric" value="1200" />
+      </label>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
