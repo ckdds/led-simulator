@@ -8,39 +8,82 @@
 </head>
 <body>
   <div class="app">
-    <div class="stage-wrapper">
-      <p class="id-label" id="idLabel">ID : 1</p>
+    <!-- 장치 1 -->
+    <div class="device">
+      <div class="stage-wrapper">
+        <p class="device-desc">ID 숫자만큼 적색 LED가 점멸</p>
+        <p class="id-label" id="idLabel1">ID : 1</p>
 
-      <div class="stage">
-        <div class="part">
-          <p class="label">LED</p>
-          <div class="led"></div>
-        </div>
+        <div class="stage">
+          <div class="part">
+            <p class="label">LED</p>
+            <div class="led" id="led1"></div>
+          </div>
 
-        <div class="part">
-          <p class="label">Button</p>
-          <div class="button" id="idButton"></div>
+          <div class="part">
+            <p class="label">Button</p>
+            <div class="button" id="idButton1"></div>
+          </div>
         </div>
+      </div>
+
+      <div class="settings">
+        <h2 class="settings__title">Timing Settings</h2>
+
+        <label class="settings__row">
+          <span>LED ON TIME (ms)</span>
+          <input type="text" id="onTimeInput1" inputmode="numeric" value="400" />
+        </label>
+
+        <label class="settings__row">
+          <span>LED OFF TIME (ms)</span>
+          <input type="text" id="offTimeInput1" inputmode="numeric" value="400" />
+        </label>
+
+        <label class="settings__row">
+          <span>INTERVAL (ms)</span>
+          <input type="text" id="intervalInput1" inputmode="numeric" value="1200" />
+        </label>
       </div>
     </div>
 
-    <div class="settings">
-      <h2 class="settings__title">Timing Settings</h2>
+    <!-- 장치 2 -->
+    <div class="device">
+      <div class="stage-wrapper">
+        <p class="device-desc">ID 숫자를 녹색 LED로 5진법으로 표시</p>
+        <p class="id-label" id="idLabel2">ID : 1</p>
 
-      <label class="settings__row">
-        <span>LED ON TIME (ms)</span>
-        <input type="text" id="onTimeInput" inputmode="numeric" value="400" />
-      </label>
+        <div class="stage">
+          <div class="part">
+            <p class="label">LED</p>
+            <div class="led" id="led2"></div>
+          </div>
 
-      <label class="settings__row">
-        <span>LED OFF TIME (ms)</span>
-        <input type="text" id="offTimeInput" inputmode="numeric" value="400" />
-      </label>
+          <div class="part">
+            <p class="label">Button</p>
+            <div class="button" id="idButton2"></div>
+          </div>
+        </div>
+      </div>
 
-      <label class="settings__row">
-        <span>INTERVAL (ms)</span>
-        <input type="text" id="intervalInput" inputmode="numeric" value="1200" />
-      </label>
+      <div class="settings">
+        <h2 class="settings__title">Timing Settings</h2>
+
+        <label class="settings__row">
+          <span>LED ON TIME (ms)</span>
+          <input type="text" id="onTimeInput2" inputmode="numeric" value="400" />
+        </label>
+
+        <label class="settings__row">
+          <span>LED OFF TIME (ms)</span>
+          <input type="text" id="offTimeInput2" inputmode="numeric" value="400" />
+        </label>
+
+        <label class="settings__row">
+          <span>INTERVAL (ms)</span>
+          <input type="text" id="intervalInput2" inputmode="numeric" value="1200" />
+        </label>
+      </div>
     </div>
   </div>
 

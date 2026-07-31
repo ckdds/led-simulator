@@ -1,17 +1,29 @@
 body {
   margin: 0;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #1b1f24;
   font-family: sans-serif;
+  padding: 32px 0;
 }
 
 .app {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.device {
+  display: flex;
   align-items: center;
   gap: 100px;
+  background: #20242b;
+  border: 1px solid #333941;
+  border-radius: 16px;
+  padding: 24px 32px;
 }
 
 .stage-wrapper {
@@ -19,6 +31,12 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 16px;
+}
+
+.device-desc {
+  margin: 0;
+  color: #9aa4b2;
+  font-size: 0.85rem;
 }
 
 .id-label {
@@ -95,9 +113,14 @@ body {
   transition: background 0.05s linear, box-shadow 0.05s linear;
 }
 
-.led.on {
+.led.on-red {
   background: radial-gradient(circle at 35% 30%, #ff8080, #cc1f1f);
   box-shadow: 0 0 20px 6px rgba(255, 40, 40, 0.6);
+}
+
+.led.on-green {
+  background: radial-gradient(circle at 35% 30%, #a8ffb8, #23a349);
+  box-shadow: 0 0 20px 6px rgba(53, 255, 107, 0.6);
 }
 
 .button {
