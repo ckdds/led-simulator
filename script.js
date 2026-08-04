@@ -21,22 +21,31 @@ function tallyBlinkColors(id) {
 // getBlinkColors(id): 현재 ID에 대해 순서대로 점멸할 색상("red"|"green") 배열을 반환한다.
 function initDevice(suffix, getBlinkColors) {
   const led = document.getElementById(`led${suffix}`);
+  if (!led) return; // 현재 페이지에 이 장치가 없으면 아무것도 하지 않는다.
+
   const idButton = document.getElementById(`idButton${suffix}`);
   const idLabel = document.getElementById(`idLabel${suffix}`);
-  const onTimeInput = document.getElementById(`onTimeInput${suffix}`);
-  const offTimeInput = document.getElementById(`offTimeInput${suffix}`);
   const intervalInput = document.getElementById(`intervalInput${suffix}`);
+
+  // 공통 ON/OFF 입력 (장치 1처럼 색상이 하나뿐인 경우 사용)
+  const genericOnTimeInput = document.getElementById(`onTimeInput${suffix}`);
+  const genericOffTimeInput = document.getElementById(`offTimeInput${suffix}`);
 
   let blinkTimerId = null;
   let currentId = 1;
 
-  // 입력창 값을 읽어 0 이상의 정수로 변환한다. (빈 값/잘못된 값은 0으로 처리)
-  function getTimingValues() {
+  // 색상별 전용 ON/OFF 입력이 있으면 그것을 쓰고, 없으면 공통 입력으로 대체한다.
+  function getColorTiming(color) {
+    const onInput = document.getElementById(`${color}OnTimeInput${suffix}`) || genericOnTimeInput;
+    const offInput = document.getElementById(`${color}OffTimeInput${suffix}`) || genericOffTimeInput;
     return {
-      onTime: Math.max(0, parseInt(onTimeInput.value, 10) || 0),
-      offTime: Math.max(0, parseInt(offTimeInput.value, 10) || 0),
-      interval: Math.max(0, parseInt(intervalInput.value, 10) || 0),
+      onTime: Math.max(0, parseInt(onInput.value, 10) || 0),
+      offTime: Math.max(0, parseInt(offInput.value, 10) || 0),
     };
+  }
+
+  function getInterval() {
+    return Math.max(0, parseInt(intervalInput.value, 10) || 0);
   }
 
   function clearBlinkTimer() {
@@ -58,16 +67,18 @@ function initDevice(suffix, getBlinkColors) {
   }
 
   function runBlinkStep(blinkCount) {
-    const { onTime, offTime, interval } = getTimingValues();
     const colors = getBlinkColors(currentId);
 
     if (blinkCount >= colors.length) {
       // 정해진 순서를 다 표시했으면 INTERVAL만큼 대기 후 처음부터 재시작
-      blinkTimerId = setTimeout(startBlinking, interval);
+      blinkTimerId = setTimeout(startBlinking, getInterval());
       return;
     }
 
-    setLedColor(colors[blinkCount]);
+    const color = colors[blinkCount];
+    const { onTime, offTime } = getColorTiming(color);
+
+    setLedColor(color);
     blinkTimerId = setTimeout(() => {
       setLedColor(null);
       blinkTimerId = setTimeout(() => {
@@ -84,16 +95,25 @@ function initDevice(suffix, getBlinkColors) {
     // 깜박임을 즉시 멈추고 LED를 끈 뒤, INTERVAL만큼 기다렸다가 새 ID로 처음부터 다시 시작한다.
     clearBlinkTimer();
     setLedColor(null);
-    const { interval } = getTimingValues();
     blinkTimerId = setTimeout(() => {
       runBlinkStep(0);
-    }, interval);
+    }, getInterval());
   }
 
   idButton.addEventListener("click", incrementId);
 
-  // 설정값이 바뀌면 새 값으로 점멸을 처음부터 다시 시작한다.
-  [onTimeInput, offTimeInput, intervalInput].forEach((input) => {
+  // 설정값이 바뀌면 새 값으로 점멸을 처음부터 다시 시작한다. (공통 입력 + 색상별 입력 모두 포함)
+  const timingInputs = [
+    genericOnTimeInput,
+    genericOffTimeInput,
+    intervalInput,
+    document.getElementById(`redOnTimeInput${suffix}`),
+    document.getElementById(`redOffTimeInput${suffix}`),
+    document.getElementById(`greenOnTimeInput${suffix}`),
+    document.getElementById(`greenOffTimeInput${suffix}`),
+  ].filter(Boolean);
+
+  timingInputs.forEach((input) => {
     input.addEventListener("change", startBlinking);
   });
 
