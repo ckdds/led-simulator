@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LED Simulator - Device 2</title>
 <link rel="stylesheet" href="style.css" />
+<style>
+  .device-nav-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+</style>
 </head>
 <body>
   <div class="app">
@@ -73,7 +80,10 @@
       </div>
     </div>
 
-    <a class="nav-button" href="index.html">LED 점멸 방법1로 이동</a>
+    <div class="device-nav-row">
+      <a class="nav-button" href="index.html">LED 점멸 방법1로 이동</a>
+      <a class="nav-button" href="rated_cur1p5.html">전류 설정 simul</a>
+    </div>
   </div>
 
   <script src="script.js"></script>

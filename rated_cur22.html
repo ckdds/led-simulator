@@ -215,7 +215,7 @@
             </div>
           </div>
 
-          <input type="range" id="slider" class="pot-slider" min="0" max="270" step="1" value="0" />
+          <input type="range" id="slider" class="pot-slider" min="0" max="270" step="1" value="45" />
           <p class="cur-set__hint">(슬라이드 바를 클릭하고 좌우 화살표로 조정하세요)</p>
           <p class="cur-set__readout" id="readout">ADC 값: 0</p>
           <p class="cur-set__readout" id="currentReadout">전류: 0.30 A</p>
@@ -241,12 +241,14 @@
     </div>
 
     <div class="cur-set__nav-row">
-      <a class="nav-button" href="index.html">led simul</a>
-      <a class="nav-button" href="rated_cur1p5.html">1.5A 현재</a>
-      <a class="nav-button" href="rated_cur1p5new.html">1.5A 개선</a>
-      <a class="nav-button" href="rated_cur22.html">22A 현재</a>
-      <a class="nav-button" href="rated_cur22new.html">22A 개선</a>
+      <a class="nav-button" href="rated_cur1p5.html">1.5A 선형</a>
+      <a class="nav-button" href="rated_cur22.html">22A 선형</a>
+      <a class="nav-button" href="rated_cur1p5new.html">1.5A 비선형</a>
+      <a class="nav-button" href="rated_cur22new.html">22A 비선형</a>
+      <a class="nav-button" href="rated_cur22pro.html">22A 실제 구현</a>
     </div>
+
+    <a class="nav-button" href="device2.html">led simul</a>
   </div>
 
   <script>
@@ -325,7 +327,7 @@
       const adc = Math.round((deg / 270) * 1023);
       settingCurrent = degToCurrent(deg);
       const currentAtAdcPlus10 = adcToCurrent(adc + 10);
-      const inFlatRange = settingCurrent <= 0.3 || currentAtAdcPlus10 >= 22;
+      const inFlatRange = deg < 45 || currentAtAdcPlus10 >= 22;
       const adcStepDiff = inFlatRange ? 0 : currentAtAdcPlus10 - adcToCurrent(adc);
       const adcStepDiffPercent = inFlatRange ? 0 : (adcStepDiff / settingCurrent) * 100;
       knob.style.transform = `rotate(${angle}deg)`;
