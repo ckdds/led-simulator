@@ -216,7 +216,7 @@
           </div>
 
           <input type="range" id="slider" class="pot-slider" min="0" max="270" step="1" value="45" />
-          <p class="cur-set__hint">(슬라이드 바를 클릭하고 좌우 화살표로 조정하세요)</p>
+          <p class="cur-set__hint">슬라이드 바는 좌우 화살표 키로 조정하세요</p>
           <p class="cur-set__readout" id="readout">ADC 값: 0</p>
           <p class="cur-set__readout" id="currentReadout">전류: 0.30 A</p>
           <p class="cur-set__readout" id="adcDiffReadout">ADC+40 전류 차이: 0.0000 A</p>
@@ -386,6 +386,16 @@
     currentDown.addEventListener('click', () => stepCurrent(-0.1));
     currentUpFine.addEventListener('click', () => stepCurrent(0.01));
     currentDownFine.addEventListener('click', () => stepCurrent(-0.01));
+
+    document.addEventListener('keydown', (e) => {
+      if (document.activeElement === currentInput) return;
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const delta = e.key === 'ArrowRight' ? 1 : -1;
+      const next = Math.min(270, Math.max(0, Number(slider.value) + delta));
+      slider.value = next;
+      update(next);
+    });
 
     update(slider.value);
   </script>
