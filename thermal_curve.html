@@ -141,6 +141,18 @@
     font-weight: bold;
   }
 
+  .thermal__result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .thermal__readout--sub {
+    color: #9aa4b2;
+    font-size: 0.9rem;
+  }
+
   .thermal__readout--cold { color: #4da3ff; }
   .thermal__readout--hot { color: #ff5a5a; }
 
@@ -226,8 +238,14 @@
 
         <div class="thermal__controls">
           <p class="thermal__readout" id="currentReadout">인가 전류: 0.00 A</p>
-          <p class="thermal__readout thermal__readout--big thermal__readout--cold" id="coldReadout">Cold: - s</p>
-          <p class="thermal__readout thermal__readout--big thermal__readout--hot" id="hotReadout">Hot: - s</p>
+          <div class="thermal__result">
+            <p class="thermal__readout thermal__readout--big thermal__readout--cold" id="coldReadout">Cold: - s</p>
+            <p class="thermal__readout thermal__readout--sub" id="coldMinReadout"></p>
+          </div>
+          <div class="thermal__result">
+            <p class="thermal__readout thermal__readout--big thermal__readout--hot" id="hotReadout">Hot: - s</p>
+            <p class="thermal__readout thermal__readout--sub" id="hotMinReadout"></p>
+          </div>
         </div>
       </div>
 
@@ -255,6 +273,8 @@
     const currentReadout = document.getElementById('currentReadout');
     const coldReadout = document.getElementById('coldReadout');
     const hotReadout = document.getElementById('hotReadout');
+    const coldMinReadout = document.getElementById('coldMinReadout');
+    const hotMinReadout = document.getElementById('hotMinReadout');
 
     // 반한시 특성 파라미터 (기능사양서 반한시특성 시트 기준, τ는 시트 결과값에 맞춘 값)
     const PARAMS = { tau: 292.4922, k: 1.1, ib: 1, ip: 1 };
@@ -339,6 +359,15 @@
       return `${t.toFixed(4)} s`;
     }
 
+    // 동작 시간을 "(N분 S.S초)" 형태로 표시한다. 1분 미만이면 초만 표시한다.
+    function formatMinSec(t) {
+      if (!Number.isFinite(t)) return '';
+      const totalTenths = Math.round(t * 10);
+      const minutes = Math.floor(totalTenths / 600);
+      const seconds = (totalTenths % 600) / 10;
+      return minutes > 0 ? `(${minutes}분 ${seconds.toFixed(1)}초)` : `(${seconds.toFixed(1)}초)`;
+    }
+
     function drawCurves() {
       coldCurve.setAttribute('d', buildPath(coldTime, PARAMS));
       hotCurve.setAttribute('d', buildPath(hotTime, PARAMS));
@@ -360,6 +389,8 @@
       currentReadout.textContent = `인가 전류: ${(ratio * p.ib).toFixed(2)} A`;
       coldReadout.textContent = `Cold: ${formatTime(cold)}`;
       hotReadout.textContent = `Hot: ${formatTime(hot)}`;
+      coldMinReadout.textContent = formatMinSec(cold);
+      hotMinReadout.textContent = formatMinSec(hot);
     }
 
     slider.addEventListener('input', update);
