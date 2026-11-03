@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LED Simulator - 반한시 특성</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+  .thermal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    background: #20242b;
+    border: 1px solid #333941;
+    border-radius: 16px;
+    padding: 32px 40px;
+  }
+
+  .thermal__title {
+    margin: 0;
+    color: #e8ecf1;
+    font-size: 1.1rem;
+  }
+
+  .formula-row {
+    display: flex;
+    gap: 48px;
+    background: #2b3038;
+    border-radius: 12px;
+    padding: 16px 28px;
+    color: #e8ecf1;
+  }
+
+  .formula {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Times New Roman', serif;
+    font-size: 1.05rem;
+  }
+
+  .formula__name {
+    font-family: sans-serif;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .formula__name--cold { color: #4da3ff; }
+  .formula__name--hot { color: #ff5a5a; }
+
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .frac__num {
+    padding: 0 4px 2px;
+    border-bottom: 1px solid #e8ecf1;
+  }
+
+  .frac__den {
+    padding: 2px 4px 0;
+  }
+
+  .formula__unit {
+    color: #9aa4b2;
+  }
+
+  .thermal__body {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .chart {
+    width: 580px;
+    height: 440px;
+    background: #1b1f24;
+    border-radius: 12px;
+  }
+
+  .chart__grid {
+    stroke: #333941;
+    stroke-width: 1;
+  }
+
+  .chart__axis {
+    stroke: #6b7480;
+    stroke-width: 1;
+    fill: none;
+  }
+
+  .chart__tick {
+    fill: #9aa4b2;
+    font-size: 12px;
+    font-family: sans-serif;
+  }
+
+  .chart__axis-title {
+    fill: #e8ecf1;
+    font-size: 13px;
+    font-family: sans-serif;
+  }
+
+  .chart__curve {
+    fill: none;
+    stroke-width: 2.5;
+  }
+
+  .chart__curve--cold { stroke: #4da3ff; }
+  .chart__curve--hot { stroke: #ff5a5a; }
+
+  .chart__cursor {
+    stroke: #e8ecf1;
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+
+  .chart__dot--cold { fill: #4da3ff; stroke: #e8ecf1; stroke-width: 1.5; }
+  .chart__dot--hot { fill: #ff5a5a; stroke: #e8ecf1; stroke-width: 1.5; }
+
+  .thermal__controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    min-width: 260px;
+  }
+
+  .thermal__readout {
+    margin: 0;
+    color: #e8ecf1;
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+  }
+
+  .thermal__readout--big {
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  .thermal__readout--cold { color: #4da3ff; }
+  .thermal__readout--hot { color: #ff5a5a; }
+
+  .thermal__hint {
+    margin: 0;
+    color: #6b7480;
+    font-size: 0.8rem;
+  }
+
+  .load-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    background: #2b3038;
+    border-radius: 12px;
+    padding: 20px 28px;
+  }
+
+  .load-slider {
+    width: 100%;
+    height: 24px;
+    accent-color: #4da3ff;
+    cursor: pointer;
+  }
+
+  .load-control__scale {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    color: #9aa4b2;
+    font-size: 0.8rem;
+  }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="thermal">
+      <h2 class="thermal__title">반한시 특성 (Thermal Curve)</h2>
+
+      <div class="formula-row">
+        <div class="formula">
+          <span class="formula__name formula__name--hot">Hot Curve</span>
+          <span><i>t</i> = <i>τ</i> ln</span>
+          <span class="frac">
+            <span class="frac__num"><i>I</i><sup>2</sup> − <i>I<sub>p</sub></i><sup>2</sup></span>
+            <span class="frac__den"><i>I</i><sup>2</sup> − (<i>kI<sub>B</sub></i>)<sup>2</sup></span>
+          </span>
+          <span class="formula__unit">[sec]</span>
+        </div>
+        <div class="formula">
+          <span class="formula__name formula__name--cold">Cold Curve</span>
+          <span><i>t</i> = <i>τ</i> ln</span>
+          <span class="frac">
+            <span class="frac__num"><i>I</i><sup>2</sup></span>
+            <span class="frac__den"><i>I</i><sup>2</sup> − (<i>kI<sub>B</sub></i>)<sup>2</sup></span>
+          </span>
+          <span class="formula__unit">[sec]</span>
+        </div>
+      </div>
+
+      <div class="thermal__body">
+        <svg class="chart" id="chart" viewBox="0 0 580 440">
+          <defs>
+            <clipPath id="plotClip">
+              <rect x="70" y="30" width="480" height="340" />
+            </clipPath>
+          </defs>
+          <g id="grid"></g>
+          <rect class="chart__axis" x="70" y="30" width="480" height="340" />
+          <g clip-path="url(#plotClip)">
+            <path class="chart__curve chart__curve--cold" id="coldCurve" />
+            <path class="chart__curve chart__curve--hot" id="hotCurve" />
+            <line class="chart__cursor" id="cursor" y1="30" y2="370" />
+            <circle class="chart__dot--cold" id="coldDot" r="5" />
+            <circle class="chart__dot--hot" id="hotDot" r="5" />
+          </g>
+          <text class="chart__axis-title" x="310" y="420" text-anchor="middle">Current (I / I<tspan font-size="10" dy="3">B</tspan>)</text>
+          <text class="chart__axis-title" x="18" y="200" text-anchor="middle" transform="rotate(-90 18 200)">Operating Time [sec]</text>
+        </svg>
+
+        <div class="thermal__controls">
+          <p class="thermal__readout" id="currentReadout">인가 전류: 0.00 A</p>
+          <p class="thermal__readout thermal__readout--big thermal__readout--cold" id="coldReadout">Cold: - s</p>
+          <p class="thermal__readout thermal__readout--big thermal__readout--hot" id="hotReadout">Hot: - s</p>
+        </div>
+      </div>
+
+      <div class="load-control">
+        <p class="thermal__readout thermal__readout--big" id="loadReadout">부하율: 1.00 배</p>
+        <input type="range" id="slider" class="load-slider" min="1" max="10" step="0.05" value="1.2" />
+        <div class="load-control__scale">
+          <span>1.0</span><span>10.0</span>
+        </div>
+        <p class="thermal__hint">좌우 화살표 키로 0.05씩 조정</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const slider = document.getElementById('slider');
+    const grid = document.getElementById('grid');
+    const coldCurve = document.getElementById('coldCurve');
+    const hotCurve = document.getElementById('hotCurve');
+    const cursor = document.getElementById('cursor');
+    const coldDot = document.getElementById('coldDot');
+    const hotDot = document.getElementById('hotDot');
+    const loadReadout = document.getElementById('loadReadout');
+    const currentReadout = document.getElementById('currentReadout');
+    const coldReadout = document.getElementById('coldReadout');
+    const hotReadout = document.getElementById('hotReadout');
+
+    // 반한시 특성 파라미터 (기능사양서 반한시특성 시트 기준, τ는 시트 결과값에 맞춘 값)
+    const PARAMS = { tau: 292.4922, k: 1.1, ib: 1, ip: 1 };
+
+    // 플롯 영역(viewBox 기준)과 로그 축 범위: X 1~10배, Y 0.1~1000초
+    const PLOT = { left: 70, top: 30, width: 480, height: 340 };
+    const X_MIN = 1, X_MAX = 10;
+    const Y_MIN = 0.1, Y_MAX = 1000;
+    const X_TICKS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const Y_TICKS = [0.1, 0.5, 1, 5, 10, 50, 100, 500, 1000];
+
+    function xToPx(x) {
+      return PLOT.left + (Math.log10(x / X_MIN) / Math.log10(X_MAX / X_MIN)) * PLOT.width;
+    }
+
+    function yToPx(y) {
+      return PLOT.top + PLOT.height - (Math.log10(y / Y_MIN) / Math.log10(Y_MAX / Y_MIN)) * PLOT.height;
+    }
+
+    function svgEl(tag, attrs, text) {
+      const el = document.createElementNS(SVG_NS, tag);
+      for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    function drawGrid() {
+      for (const x of X_TICKS) {
+        const px = xToPx(x);
+        grid.appendChild(svgEl('line', { class: 'chart__grid', x1: px, x2: px, y1: PLOT.top, y2: PLOT.top + PLOT.height }));
+        grid.appendChild(svgEl('text', { class: 'chart__tick', x: px, y: PLOT.top + PLOT.height + 18, 'text-anchor': 'middle' }, x));
+      }
+      for (const y of Y_TICKS) {
+        const py = yToPx(y);
+        grid.appendChild(svgEl('line', { class: 'chart__grid', x1: PLOT.left, x2: PLOT.left + PLOT.width, y1: py, y2: py }));
+        grid.appendChild(svgEl('text', { class: 'chart__tick', x: PLOT.left - 8, y: py + 4, 'text-anchor': 'end' }, y));
+      }
+    }
+
+    // 부하율(I/IB)에 대한 동작 시간(초). I ≤ k·IB 이면 동작하지 않으므로 Infinity를 반환한다.
+    function coldTime(ratio, p) {
+      const i = ratio * p.ib;
+      const pickup2 = (p.k * p.ib) ** 2;
+      if (i * i <= pickup2) return Infinity;
+      return p.tau * Math.log((i * i) / (i * i - pickup2));
+    }
+
+    function hotTime(ratio, p) {
+      const i = ratio * p.ib;
+      const pickup2 = (p.k * p.ib) ** 2;
+      if (i * i <= pickup2) return Infinity;
+      const numerator = i * i - p.ip * p.ip;
+      if (numerator <= 0) return 0;
+      return Math.max(0, p.tau * Math.log(numerator / (i * i - pickup2)));
+    }
+
+    // 로그 X축에서 균등 간격으로 샘플링해 곡선을 그린다. 축 밖 값은 범위 끝으로 눌러서 clipPath로 잘라낸다.
+    function buildPath(timeFn, p) {
+      const SAMPLES = 400;
+      let d = '';
+      for (let n = 0; n <= SAMPLES; n++) {
+        const ratio = X_MIN * Math.pow(X_MAX / X_MIN, n / SAMPLES);
+        const t = timeFn(ratio, p);
+        if (!Number.isFinite(t)) continue;
+        const clampedT = Math.min(Y_MAX * 10, Math.max(Y_MIN / 10, t));
+        d += `${d ? 'L' : 'M'}${xToPx(ratio).toFixed(2)} ${yToPx(clampedT).toFixed(2)} `;
+      }
+      return d;
+    }
+
+    function placeDot(dot, ratio, t) {
+      const visible = Number.isFinite(t) && t >= Y_MIN && t <= Y_MAX;
+      dot.style.display = visible ? '' : 'none';
+      if (visible) {
+        dot.setAttribute('cx', xToPx(ratio));
+        dot.setAttribute('cy', yToPx(t));
+      }
+    }
+
+    function formatTime(t) {
+      if (!Number.isFinite(t)) return '동작 안 함';
+      return `${t.toFixed(4)} s`;
+    }
+
+    function drawCurves() {
+      coldCurve.setAttribute('d', buildPath(coldTime, PARAMS));
+      hotCurve.setAttribute('d', buildPath(hotTime, PARAMS));
+    }
+
+    function update() {
+      const p = PARAMS;
+      const ratio = Number(slider.value);
+      const cold = coldTime(ratio, p);
+      const hot = hotTime(ratio, p);
+
+      const cursorX = xToPx(ratio);
+      cursor.setAttribute('x1', cursorX);
+      cursor.setAttribute('x2', cursorX);
+      placeDot(coldDot, ratio, cold);
+      placeDot(hotDot, ratio, hot);
+
+      loadReadout.textContent = `부하율: ${ratio.toFixed(2)} 배 (${(ratio * 100).toFixed(0)}%)`;
+      currentReadout.textContent = `인가 전류: ${(ratio * p.ib).toFixed(2)} A`;
+      coldReadout.textContent = `Cold: ${formatTime(cold)}`;
+      hotReadout.textContent = `Hot: ${formatTime(hot)}`;
+    }
+
+    slider.addEventListener('input', update);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const delta = e.key === 'ArrowRight' ? 0.05 : -0.05;
+      const next = Math.min(X_MAX, Math.max(X_MIN, Math.round((Number(slider.value) + delta) * 20) / 20));
+      slider.value = next;
+      update();
+    });
+
+    drawGrid();
+    drawCurves();
+    update();
+  </script>
+</body>
+</html>
